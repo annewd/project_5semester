@@ -56,3 +56,4 @@ for i in n:
     bt.add_in_tree(i)
 for a in bt:
     print(a)
+bt.print_node()
