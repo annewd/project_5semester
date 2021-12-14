@@ -19,7 +19,7 @@ class AVLTree(object):
         else:
             return self._find(key, self.root)
             
-   def _find(self, key, node):
+    def _find(self, key, node):
         # Если узел пустой, соответствующее значение ключа не может быть найдено и возвращается пустое
         if not node:
             return None
@@ -101,7 +101,7 @@ class AVLTree(object):
                  # Возврат к измененному корневому узлу поддерева, который является центральным узлом исходного трехсвязного узла
         return k1
  
-   def right_left_rotate(self, node):
+    def right_left_rotate(self, node):
                  # Сначала начните с правого дочернего узла корневого узла поддерева (то есть с рисунка выше5) Как центр повернуть вправо, а3Включите его.
         node.right = self.left_left_rotate(node.right)
                  # После вышеуказанных операций вы можете использовать правильное вращение(Поверните влево)Для достижения цели разрешения конфликта.
@@ -172,12 +172,12 @@ class AVLTree(object):
              self.preOrderTraverse(node.left)
              self.preOrderTraverse(node.right)
              
-Реализация #avlTree завершена. Проверить следующим образом
- # Введите массив как элемент, в котором должен храниться каждый узел дерева
+
+# Введите массив как элемент, в котором должен храниться каждый узел дерева
 n = list(map(int,input().split()))
  #   avl   Экземпляр
 avl = AVLTree()
- # Вставить элементы списка в сбалансированное двоичное дерево 
+# Вставить элементы списка в сбалансированное двоичное дерево 
 for i in range(len(n)):
     avl.insert(n[i])
 avl.preOrderTraverse(avl.root)
