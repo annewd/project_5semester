@@ -1,5 +1,5 @@
+import functools
 import time
-import pickle
 
 def slow_down(func):
     #Подождать секунду перед тем как вызывать функцию 
@@ -44,7 +44,7 @@ class Node:
 	def __iter__(self): 
 		if self.left is not None: 
 			yield from self.left 
-			yield self.value 
+		yield self.value 
 		if self.right is not None: 
 			yield from self.right 
  
