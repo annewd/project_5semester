@@ -1,3 +1,14 @@
+import time
+import pickle
+
+def slow_down(func):
+    #Подождать секунду перед тем как вызывать функцию 
+    @functools.wraps(func)
+    def wrapper_slow_down(*args, **kwargs):
+        time.sleep(5)
+        return func(*args, **kwargs)
+    return wrapper_slow_down
+
 class Node: 
 	def __init__(self, value = None): 
 		self.value = value 
@@ -21,6 +32,7 @@ class Node:
 			self.left.add_in_node(elem) 
 		elif elem.value < self.value and self.left == None:
 			self.left = elem 
+	@slow_down
 	def print_Node(self): 
 		if self.value == None:
 		    return 
