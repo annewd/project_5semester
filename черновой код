@@ -1,202 +1,174 @@
-#Для начала создадим узел дерева как класс (подкласс), который также будет включать в себя параметр высоты для определения, сбалансировано ли оно
-class TreeNode(object):
-    def __init__(self, data, left=None, right=None):
-        self.data = data
-        self.left = left
-        self.right = right
-        self.height = 0
-class AVLTree(object):
-         # Функция инициализации: создадим пустой корневой узел
+class Node:
+    def __init__(self,key):
+        self.key=key
+        self.left=None
+        self.right=None
+        self.height=0
+class AVLTree:
     def __init__(self):
-        self.root = None
-        #find, чтобы найти находится ли ключ в дереве avl.
-         
-    def find(self, key):
-        # Корень дерева пуст, значит, возврат пустой
-        if not self.root:
+        self.root=None
+        
+    def find(self,key):
+        if self.root is None:
             return None
-        # В противном случае ищем корневой узел входящего дерева
         else:
-            return self._find(key, self.root)
-            
-    def _find(self, key, node):
-        # Если узел пустой, соответствующее значение ключа не может быть найдено и возвращается пустое
-        if not node:
+            return self._find(key,self.root)
+    def _find(self,key,node):
+        if node is None:
             return None
-        # Если мы хотим найти ключ меньше данных текущего узла, найдем его в левом поддереве
-        elif key < node.data:
-            return self._find(key, node.left)
-        # Если ключ, который мы ищем, больше данных, хранящихся в текущем узле, перейдем к правому поддереву текущего узла, чтобы найти
-        elif key > node.data:
-            return self._find(key, node.right)
-        # Если все вышеуказанные условия не выполняются, то данные, хранящиеся в этом узле, равны значению ключа, то есть соответствующий элемент найден, и узел может быть возвращен
+        elif key<node.key:
+            return self._find(key,self.left)
+        elif key>node.key:
+            return self._find(key,self.right)
         else:
-            # Используется для рекурсивного возврата результата вверх. Должно возвращаться последнее возвращенное значение узла предыдущей рекурсивной функции, а окончательный возврат - это найденный узел
             return node
             
-    # Найдем самый маленький элемент в дереве avl
     def findMin(self):
         if self.root is None:
             return None
-        # Корень дерева не пустой, вернем минимальное значение дерева
         else:
             return self._findMin(self.root)
             
-    #Увеличим входящий узел параметра, чтобы облегчить рекурсию
-    def _findMin(self, node):
-        # Пока у текущего узла есть левый дочерний узел, левый дочерний узел меньше текущего узла, перейдем к левому дочернему узлу и продолжим в том же духе
+    def _findMin(self,node):
         if node.left:
-                         # Используется для рекурсивного масштабирования и уменьшения размера проблемы
             return self._findMin(node.left)
-                 #Кончился левый потомок. Возвращает текущее значение узла, которое является наименьшим.
         else:
-                         # Аналогично последнему предложению _find, используется для рекурсивного возврата вверх
             return node
             
-    # Найдем максимальное значение дерева avl и используем тот же метод для поиска
     def findMax(self):
         if self.root is None:
             return None
         else:
             return self._findMax(self.root)
             
-    def _findMax(self, node):
-                 # Максимальное значение отображается справа и должно быть увеличено до правого потомка последовательно
+    def _findMax(self,node):
         if node.right:
             return self._findMax(node.right)
         else:
             return node
             
-    # Подтвердим высоту дерева AVL или одного из его поддеревьев, входным параметром является узел
-    def height(self, node):
-        # Пустое дерево не имеет высоты, возврат-1
+    def height(self,node):
         if node is None:
             return -1
-        # В противном случае вернуть высоту узла напрямую
         else:
             return node.height
             
+    #   обход
+    def Preorder(self):
+        if self.root:
+            self.preorder(self.root)
+            print()
             
-         # Теперь подумаем над балансировкой (Боже, помоги). Это правое вращение дерева, если его левая рука слишком длинная
-         # Добавим новый узел в левое поддерево левого потомка k1 узла, повернем влево
-         # Входным паметром должен быть узел непосредственно над тем самым левым узлом
-    def left_left_rotate(self, node):
-        # k1 первая точка на левый дочерний узел узла
-        k1 = node.left
-                 # Начать вращение. После вставки форма узла образует тройное соединение слева-слева-слева.
-                 # Вращение - это процесс подъема средних узлов тройного соединения, поэтому ключевым моментом является построение формы средних узлов.
-                 # Формирование новой формы в два этапа.
-                 # Первый шаг, релиз вот-вот поднимется(Посередине картинка3)Правый ребенок узла
-                 # Назначьте его самому верхнему узлу в исходных трех компаниях(Картина5)Левый ребенок, освободи правого ребенка.
-        node.left = k1.right
-                 # Второй шаг - установить правый дочерний элемент среднего узла как самый верхний узел в исходных трех соединениях, и новая форма будет завершена
-        k1.right = node
-                 # Измените высоту узла, на котором он расположен
-        #node (верхний узел трех исходных компаний, соответствующий 5 на рисунке) отклонен.
-                 # Высота поддерева с корнем в узле равна большему значению его нового левого поддерева и исходного правого поддерева плюс1
-        node.height = max(self.height(node.right), self.height(node.left)) + 1
-                 # Кk1(Исходный трехсвязный промежуточный узел, соответствующий на рисунке3)Подвернулся.
-                 # Высота поддерева с корнем k1 - это его исходное левое поддерево и новое правое поддерево(Дерево с корнем в узле)Большее значение плюс1
-        k1.height = max(self.height(k1.left), node.height) + 1
-                 # Возврат к измененному корневому узлу поддерева, который является центральным узлом исходного трехсвязного узла
-        return k1
-    def right_right_rotate(self, node):
-        # k1 эквивалентен указанному выше узлу 4 вне блока кода
-        k1 = node.right
-                 # Начать вращение. После вставки форма узла представляет собой правое, правое и правое тройное соединение.(См. Диаграмму вне блока кода,Право, право, право, хранилище2、4、5Узел(Не включено6))。
-                 # Вращение - это процесс подъема средних узлов тройного соединения, поэтому ключевым моментом является построение формы средних узлов.
-                 # Формирование новой формы в два этапа.
-                 # Первый шаг, релиз вот-вот поднимется(Посередине картинка4)Левый дочерний элемент узла
-                 # Назначьте его самому верхнему узлу в исходных трех компаниях(Картина2)Правый ребенок, освободите левого ребенка.
-        node.right = k1.left
-                 # Второй шаг - установить левый дочерний элемент среднего узла как самый верхний узел в исходных трех соединениях, и новая форма будет завершена
-        k1.left = node
-                 # Измените высоту узла, на котором он расположен
-        #node (верхний узел трех исходных компаний, соответствующий 2 на рисунке) отклонен.
-                 # Высота поддерева с корнем в узле равна большему значению его нового правого поддерева, а исходное левое поддерево плюс1
-        node.height = max(self.height(node.right), self.height(node.left)) + 1
-                 # Кk1(Исходный трехсвязный промежуточный узел, соответствующий на рисунке4)Подвернулся.
-                 # Высота поддерева с корнем k1 - это его исходное правое поддерево и новое левое поддерево(Дерево с корнем в узле)Большее значение плюс1
-        k1.height = max(self.height(k1.right), node.height) + 1
-                 # Вернуться к корневому узлу текущего поддерева, то есть k1
-        return k1
-    def right_left_rotate(self, node):
-                 # Сначала начните с правого дочернего узла корневого узла поддерева (то есть с рисунка выше5) Как центр повернуть вправо, а3Включите его.
-        node.right = self.left_left_rotate(node.right)
-                 # После вышеуказанных операций вы можете использовать правильное вращение(Поверните влево)Для достижения цели разрешения конфликта.
-                 # Ось вращения должна быть вверху справа, справа и трех звеньев, т.е.2узел
-        return self.right_right_rotate(node)
-   ## Посмотрите на ситуацию, когда более двух узлов сначала расширяют приложение влево, а затем расширяют приложение вправо
-    def left_right_rotate(self, node):
-                 # Сначала возьмите левый дочерний узел корневого узла поддерева (то есть на рисунке выше2) Как центр повернуть влево, а3Включите его.
-        node.left = self.right_right_rotate(node.left)
-                 # После вышеуказанных операций вы можете использовать левое и левое вращение(Правша)Для достижения цели разрешения конфликта.
-                 # Ось вращения должна быть вверху из трех последовательных левых, левых и левых, т.е.5Узел
-        return self.left_left_rotate(node)
-         # На основе вышеуказанного поворота вставляется элемент дерева AVL. Вставленный элемент - это ключ.
-         # Аналогично первому поиску, отдельные публичные и частные методы.
-    def insert(self, key):
-                 # Если корень вообще не существует, значит такого дерева нет. Непосредственно использовать вставляемый элемент как корень дерева
-        if not self.root:
-            self.root = TreeNode(key)
-                 # В противном случае вызовите частный метод, чтобы оценить позицию вставки, вставить и разрешить конфликт из корня дерева.
+    def preorder(self,node):
+        if node:
+            print(node.key,end="")
+            self.preorder(node.left)
+            self.preorder(node.right)
+    
+         #
+    def rotate_right(self,node):
+        k=node.left
+        node.left=k.right
+        k.right=node
+        node.height=max(self.height(node.left),self.height(node.right))+1
+        k.height=max(self.height(k.left),node.height)+1
+        return k
+        
+         #
+    def rotate_left(self,node):
+        k=node.right
+        node.right=k.left
+        k.left=node
+        node.height=max(self.height(node.left),self.height(node.right))+1
+        k.height=max(self.height(k.right),node.height)+1
+        return k
+        
+         #    .
+    def rotate_le_ri(self,node):
+        node.left=self.rotate_left(node.left)
+        return self.rotate_right(node)
+        
+	  #    .
+    def rotate_ri_le(self,node):
+        node.right=self.rotate_right(node.right)
+        return self.rotate_left(node)
+    def Insert(self,key):
+        if self.root is None:
+            self.root=Node(key)
         else:
-            self.root = self._insert(key, self.root)
-         # Вставить частный метод, еще один параметр узла
-    def _insert(self, key, node):
-                 # Рекурсивный последний шаг вставки.
-                 # Если узел отсутствует, это означает, что он достиг позиции, которую нужно вставить, и напрямую преобразовать ключ в узел и заполнить его.
-                 # Если это выполненоifЗаявление, узел ключа добавлен в дерево
-        if node is None:
-            node = TreeNode(key)
-                 # Если значение ключа меньше текущего указывающего узла, сузьте диапазон влево и используйте влево или влево, когда конфликт разрешен.
-        elif key < node.data:
-                         #Recursion продвигается вниз по дереву, превращая его в меньшую проблему.
-            node.left = self._insert(key, node.left)
-                         # После этого рекурсивного вызова мы наконец получаем правильную позицию, которую нужно вставить.
-                         # После вставки оцените и скорректируйте конфликты, которые не соответствуют правилам сбалансированного дерева.
-                         # Критерием определения необходимости корректировки является текущий ближайший узел поддерева.left,node.справа разница в высоте меньше чем2условия.
-                         #Recursion Каждый раз, когда вы возвращаетесь к предыдущему уровню, эта функция оценки будет вызываться для оценки уровня за слоем, пока не вернется к корневому узлу.
-                         # Пока правила просто где-то не соблюдаются(только что прибыл2), Исправить вовремя. Убедитесь, что максимальная разница высот никогда не превышает2
-                         # После следующего блока кода любое поддерево было оценено и преобразовано в соответствии с условиями сбалансированного двоичного дерева            
-            if (self.height(node.left) - self.height(node.right)) == 2:
-                                 #этоifУтверждение верно, должен быть конфликт, и он должен быть разрешен из узла.
-                                 # При рекурсивном возврате результата я не знаю конкретное положение ключа относительно дочернего узла узла
-                                 # Следовательно, сравните ключ с дочерними узлами узла, чтобы узнать, вставлен ли ключ слева или справа от дочернего узла текущего конфликтующего узла.
-                                 # Если он меньше, чем левый дочерний элемент текущего узла конфликта, очевидно, что он разрешается с помощью left_left_rotate.
-                if key < node.left.data:
-                    node = self.left_left_rotate(node)
-                                 # В противном случае из-за начальногоifОператор определяет, что вставленное значение ключа меньше, чем текущий узел, поэтому возможно только то, что трехсвязный узел соответствует форме-left-right -, и соответствующая настройка может быть достигнута сначала влево, а затем вправо(Тройные узлы всегда могут не включать ключевые узлы)
-                else:
-                    node = self.left_right_rotate(node)
-                 # Полная двойственность. Когда ключ больше, чем текущие данные хранилища узла
-        elif key > node.data:
-                         # При рекурсивном спуске он еще не вставлен. Сводится к подзадачам
-                         # Если он больше целевого узла, его следует вставить справа
-            node.right = self._insert(key, node.right)
-                         # Следующее точно такое же, как и выше. Рекурсивная подзадача решена: следующие операторы выполняются, когда результаты проверяются рекурсивно вверх.
-            if (self.height(node.right) - self.height(node.left)) == 2:
-                if key > node.right.data:
-                    node = self.right_right_rotate(node)
-                else:
-                    node = self.left_right_rotate(node)
-                 # Рекурсивное обновление высоты дерева
-        node.height = max(self.height(node.right), self.height(node.left)) + 1
-                 # Вернуться к корневому узлу дерева после вставки. Он может отличаться от входного узла.
-        return node
-         # Предварительный обход полностью сбалансированного дерева точно такой же, как и общее двоичное дерево,Больше никогда.
-    def preOrderTraverse(self, node):
-         if node is not None:
-             print(node.data)
-             self.preOrderTraverse(node.left)
-             self.preOrderTraverse(node.right)
-             
+            self.root=self.insert(key,self.root)        
 
-# Введите массив как элемент, в котором должен храниться каждый узел дерева
+    def insert(self,key,node):
+        if not node:
+            node=Node(key)
+        elif key<node.key:
+            node.left=self.insert(key,node.left)
+            if self.height(node.left)-self.height(node.right)==2:
+                if key<node.left.key:
+                                         # Оставил влево
+                    node=self.rotate_right(node)
+                else:
+                    node=self.rotate_le_ri(node)
+        elif key>node.key:
+            node.right=self.insert(key,node.right)
+            if self.height(node.right)-self.height(node.left)==2:
+                if key>node.right.key:
+                    node=self.rotate_left(node)
+                else:
+                    node=self.rotate_ri_le(node)
+        node.height=max(self.height(node.left),self.height(node.right))+1
+        return node
+
+
+    def Remove(self,key):
+        if self.root is None:
+            raise KeyError("No such key found!")
+        else:
+            self.root=self.remove(key,self.root)
+    
+    def remove(self,key,node):
+        if node is None:
+            print("No such key found!")
+        elif key<node.key:
+            node.left=self.remove(key,node.left)
+            if self.height(node.right)-self.height(node.left)==2:
+                if self.height(node.right.right)>=self.height(node.right.left):
+                    node=self.rotate_left(node)
+                else:
+                    node=self.rotate_ri_le(node)
+            node.height=max(self.height(node.left),self.height(node.right))+1
+        elif key>node.key:
+            node.right=self.remove(key,node.right)
+            if self.height(node.left)-self.height(node.right)==2:
+                if self.height(node.left.right)>self.height(node.left.left):
+                    node=self.rotate_le_ri(node)
+                else:
+                    node=self.rotate_right(node)
+            node.height=max(self.height(node.left),self.height(node.right))+1
+        elif node.left and node.right:
+                         #    .
+            if self.height(node.left)>=self.height(node.right):
+                                 #      , то правильное дерево ищет наименьшее место, чтобы сделать корне
+                k=self._findMin(node.right)
+                node.key=k.key
+                node.right=self.remove(k.key,node.right)
+            else:
+                                 #        , то левое судно ищет самое большое место, чтобы сделать корни
+                k=self._findMax(node.left)
+                node.key=k.key
+                node.left=self.remove(k.key,node.left)
+            node.height=max(self.height(node.left),self.height(node.right))+1
+        else:
+                         # Только левый ребенок или правый ребенок или нет
+            if node.left:
+                node=node.left
+            else:
+                         #   узел также в этом случае
+                node=node.right
+        return node
 n = list(map(int,input().split()))
- #   avl   Экземпляр
-avl = AVLTree()
-# Вставить элементы списка в сбалансированное двоичное дерево 
-for i in range(len(n)):
-    avl.insert(n[i])
-avl.preOrderTraverse(avl.root)
+p=AVLTree()
+p.Insert(n)
+p.Preorder()
+
+
