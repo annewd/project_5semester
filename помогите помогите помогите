@@ -32,7 +32,7 @@ class Node:
 	def __iter__(self): 
 		if self.left is not None: 
 			yield from self.left 
-			yield self.value 
+		yield self.value 
 		if self.right is not None: 
 			yield from self.right 
  
