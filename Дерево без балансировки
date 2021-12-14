@@ -27,7 +27,7 @@ class Node:
 		print(self.value) 
 		if self.left != None: 
 			self.left.print_Node() 
-		if self.rigth != None: 
+		if self.right != None: 
 			self.right.print_Node() 
 	def __iter__(self): 
 		if self.left is not None: 
